@@ -1,6 +1,8 @@
 import os
 from typing import Dict
 
+from tokens import token_functions
+
 
 class FileManager:
     """"""
@@ -14,16 +16,18 @@ class FileManager:
         with open(file_path, "r") as file:
             return file.read()
 
-    def _generate_tokens_from_content(self, file_content: str) -> list[str]:
+    def _generate_tokens_from_content(
+        self, file_extention: str, file_content: str
+    ) -> list[str]:
         """"""
-        return []
+        return token_functions[file_extention](file_content)
 
     def load_file(self, file_path: str) -> None:
         """"""
         file_name = os.path.basename(file_path)
         file_extension = file_name.split(".", 1)[1]
         file_content = self._read_file_content(file_path)
-        file_tokens = self._generate_tokens_from_content(file_content)
+        file_tokens = self._generate_tokens_from_content(file_extension, file_content)
         file_data = {
             "file_name": file_name,
             "file_extention": file_extension,
