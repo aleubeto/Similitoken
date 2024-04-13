@@ -6,9 +6,6 @@ setup(
     version="0.1",
     packages=find_packages(exclude=["tests*"]),
     install_requires=[
-        'difflib',
-    ],
-    dependency_links=[
-        'https://github.com/m-labs/pythonparser/tarball/master#egg=pythonparser-1.0',
+        "pythonparser @ https://github.com/m-labs/pythonparser/archive/master.zip",
     ],
 )
