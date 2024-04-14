@@ -2,42 +2,48 @@ import os
 from typing import Dict
 
 from tokens import token_functions
+from pythonparser import Token
 
 
 class FileManager:
-    """"""
+    """Wrapper class that will process and store files information
+    in order to find plagiarism between code files."""
 
     def __init__(self) -> None:
         self.processed_files = {}
         pass
 
     def _read_file_content(self, file_path: str) -> str:
-        """"""
+        """Returns the content of a given file inside
+        a string."""
         with open(file_path, "r") as file:
             return file.read()
 
-    def _generate_tokens_from_content(
-        self, file_extention: str, file_content: str
-    ) -> list[str]:
-        """"""
-        return token_functions[file_extention](file_content)
+    def _generate_tokens_from_file(self, file_data: Dict[str, str]) -> list[Token]:
+        """Returns a list with the processed tokens from
+        the content of a given file."""
+        language_extention = file_data.get("extention")
+        return token_functions[language_extention](file_data)
 
     def load_file(self, file_path: str) -> None:
-        """"""
+        """Process and stores the data of a given file inside
+        the processed_files dictionary."""
         file_name = os.path.basename(file_path)
         file_extension = file_name.split(".", 1)[1]
         file_content = self._read_file_content(file_path)
-        file_tokens = self._generate_tokens_from_content(file_extension, file_content)
         file_data = {
-            "file_name": file_name,
-            "file_extention": file_extension,
-            "file_content": file_content,
-            "tokens": file_tokens,
+            "path": file_path,
+            "name": file_name,
+            "extention": file_extension,
+            "content": file_content,
         }
+        file_tokens = self._generate_tokens_from_file(file_data)
+        file_data["tokens"] = file_tokens
         formatted_path = os.path.normpath(file_path)
         self.processed_files[formatted_path] = file_data
-        print(self.processed_files)
 
     def get_file_data(self, file_path) -> Dict[str, str]:
-        """"""
-        return self.processed_files[file_path]
+        """Returns a dictionary with name, path, file extention,
+        content and tokens list from a given file."""
+        formatted_path = os.path.normpath(file_path)
+        return self.processed_files[formatted_path]
