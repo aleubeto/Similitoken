@@ -1,9 +1,8 @@
 import os
-import difflib
-from typing import Dict
-
-from tokens import token_functions, normalize_tokens_list
+from typing import Dict, List, Tuple
 from pythonparser.lexer import Token
+
+from tokens import token_functions
 
 
 class FileManager:
@@ -25,6 +24,48 @@ class FileManager:
         the content of a given file."""
         language_extention = file_data.get("extention")
         return token_functions[language_extention](file_data)
+
+    def _process_identifier_token(
+        self, token: Token, counter: int
+    ) -> Tuple[str, str, str]:
+        """Processes identifier tokens."""
+        token_range = (
+            f"{token.loc.begin_pos}-{token.loc.end_pos}-{token.loc.expanded_from}"
+        )
+        token_kind = token.kind
+        token_value = f"ident_{counter}"
+        return token_range, token_kind, token_value
+
+    def _process_token(self, token: Token) -> Tuple[str, str, str]:
+        """Processes non-identifier tokens."""
+        token_range = (
+            f"{token.loc.begin_pos}-{token.loc.end_pos}-{token.loc.expanded_from}"
+        )
+        token_kind = token.kind
+        token_value = token.value
+        return token_range, token_kind, token_value
+
+    def _normalize_tokens_list(self, tokens_list: list[Token]) -> list[str]:
+        """
+        Takes a list of tokens and returns a copy with
+        the identifiers tokens renamed as ident_n and
+        without the ignored token kinds.
+        """
+        normalized_tokens = []
+        ignored_token_types = ("newline",)
+        identifiers_count = 0
+
+        for token in tokens_list:
+            token_type = token.kind
+            if token_type == "ident":
+                normalized_tokens.append(
+                    self._process_identifier_token(token, counter=identifiers_count)
+                )
+                identifiers_count += 1
+            elif token_type not in ignored_token_types:
+                normalized_tokens.append(self._process_token(token))
+
+        return normalized_tokens
 
     def load_file(self, file_path: str) -> None:
         """Process and stores the data of a given file inside
@@ -53,5 +94,5 @@ class FileManager:
         """"""
         file1_tokens = self.get_file_data(file1_path).get("tokens")
         file2_tokens = self.get_file_data(file2_path).get("tokens")
-        normalized_file1_tokens = normalize_tokens_list(file1_tokens)
-        normalized_file2_tokens = normalize_tokens_list(file2_tokens)
+        normalized_file1_tokens = self._normalize_tokens_list(file1_tokens)
+        normalized_file2_tokens = self._normalize_tokens_list(file2_tokens)
