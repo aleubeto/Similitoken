@@ -2,7 +2,7 @@ import os
 from typing import Dict
 
 from tokens import token_functions
-from pythonparser import Token
+from pythonparser.lexer import Token
 
 
 class FileManager:
