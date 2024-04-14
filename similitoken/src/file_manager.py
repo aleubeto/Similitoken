@@ -1,7 +1,8 @@
 import os
+import difflib
 from typing import Dict
 
-from tokens import token_functions
+from tokens import token_functions, normalize_tokens_list
 from pythonparser.lexer import Token
 
 
@@ -47,3 +48,10 @@ class FileManager:
         content and tokens list from a given file."""
         formatted_path = os.path.normpath(file_path)
         return self.processed_files[formatted_path]
+
+    def compare_files(self, file1_path: str, file2_path: str) -> list[str]:
+        """"""
+        file1_tokens = self.get_file_data(file1_path).get("tokens")
+        file2_tokens = self.get_file_data(file2_path).get("tokens")
+        normalized_file1_tokens = normalize_tokens_list(file1_tokens)
+        normalized_file2_tokens = normalize_tokens_list(file2_tokens)
