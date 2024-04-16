@@ -23,5 +23,6 @@ if __name__ == "__main__":
     matches = tokens.find_match_ranges_from_tokens(file1_tokens, file2_tokens)
     for match in matches:
         print(match)
-        print(files.extract_content_from_range(match[0][0], match[0][1], file1_content))
-        print(files.extract_content_from_range(match[1][0], match[1][1], file2_content))
+        match_range_1, match_range_2 = match[0], match[1]
+        print(file1_content[match_range_1[0] : match_range_1[1]])
+        print(file2_content[match_range_2[0] : match_range_2[1]])

@@ -46,9 +46,3 @@ class FileManager:
             else self.processed_files.get(formatted_path)
         )
         return file_data
-
-    def extract_content_from_range(
-        self, start_index: int, end_index: int, file_content: str
-    ) -> str:
-        """"""
-        return file_content[start_index:end_index]

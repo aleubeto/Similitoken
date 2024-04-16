@@ -72,7 +72,7 @@ class TokenManager:
         matching_blocks = matcher.get_matching_blocks()
         return matching_blocks
 
-    def _extract_index_range_from_matching_tokens(self, tokens_list):
+    def _extract_index_range_from_tokens(self, tokens_list):
         """"""
         match_ranges = [token[0][:-1] for token in tokens_list]
         match_start = match_ranges[0][0]
@@ -81,7 +81,7 @@ class TokenManager:
 
     def find_match_ranges_from_tokens(self, token_list_1: str, token_list_2: str):
         """"""
-        output = []
+        match_ranges = []
         normalized_list_1 = self._normalize_tokens_list(token_list_1)
         normalized_list_2 = self._normalize_tokens_list(token_list_2)
         token_values_1 = [token[1:] for token in normalized_list_1]
@@ -93,14 +93,14 @@ class TokenManager:
             if n > 0:
                 matching_tokens_1 = normalized_list_1[i : i + n]
                 matching_tokens_2 = normalized_list_2[j : j + n]
-                start_match_1, end_match_1 = (
-                    self._extract_index_range_from_matching_tokens(matching_tokens_1)
+                start_match_1, end_match_1 = self._extract_index_range_from_tokens(
+                    matching_tokens_1
                 )
-                start_match_2, end_match_2 = (
-                    self._extract_index_range_from_matching_tokens(matching_tokens_2)
+                start_match_2, end_match_2 = self._extract_index_range_from_tokens(
+                    matching_tokens_2
                 )
-                output.append(
+                match_ranges.append(
                     ((start_match_1, end_match_1), (start_match_2, end_match_2))
                 )
 
-        return output
+        return match_ranges
