@@ -20,12 +20,15 @@ if __name__ == "__main__":
     file1_content = file1_data["content"]
     file2_content = file2_data["content"]
 
+    matches = tokens.find_relevant_matches(file1_tokens, file2_tokens)
+
     for match in matches:
         print("Match Found:")
         print(f"File 1 Content [{match[0][0]}:{match[0][1]}]:")
         print(file1_content[match[0][0]:match[0][1]])
+        print("---------------")
         print(f"File 2 Content [{match[1][0]}:{match[1][1]}]:")
         print(file2_content[match[1][0]:match[1][1]])
-        print("\n")
+        print("\n" + "-"*50 + "\n")
 
     plot_matches(matches, len(file1_content), len(file2_content), img_name="comparison_output")
