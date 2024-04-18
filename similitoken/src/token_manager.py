@@ -5,102 +5,56 @@ from difflib import Match
 
 from tokens import token_functions
 
-
 class TokenManager:
-    """"""
-
     def __init__(self) -> None:
-        pass
+        self.ignored_token_types = ("newline", "comment")  # Ajuste para ignorar los comentarios en el análisis
 
-    def generate_tokens_from_file(self, file_data: Dict[str, str]) -> list[Token]:
-        """Returns a list with the processed tokens from
-        the content of a given file."""
-        language_extention = file_data.get("extention")
-        return token_functions[language_extention](file_data)
+    def generate_tokens_from_file(self, file_data: Dict[str, str]) -> List[Token]:
+        language_extension = file_data.get("extension")
+        if language_extension and language_extension in token_functions:
+            return token_functions[language_extension](file_data)
+        else:
+            raise ValueError(f"Unsupported file extension: {language_extension}")
 
-    def _process_identifier_token(
-        self, token: Token, counter: int
-    ) -> Tuple[str, str, str]:
-        """Processes identifier tokens."""
-        token_range = (
-            token.loc.begin_pos,
-            token.loc.end_pos,
-            token.loc.expanded_from,
-        )
-        token_kind = token.kind
-        token_value = f"ident_{counter}"
-        return token_range, token_kind, token_value
+    def _process_identifier_token(self, token: Token, counter: int) -> Tuple[Tuple[int, int, str], str, str]:
+        """Return token details with identifiers renamed."""
+        token_range = (token.loc.begin_pos, token.loc.end_pos)
+        return (token_range, token.kind, f"ident_{counter}")
 
-    def _process_token(self, token: Token) -> Tuple[str, str, str]:
-        """Processes non-identifier tokens."""
-        token_range = (
-            token.loc.begin_pos,
-            token.loc.end_pos,
-            token.loc.expanded_from,
-        )
-        token_kind = token.kind
-        token_value = token.value
-        return token_range, token_kind, token_value
+    def _process_token(self, token: Token) -> Tuple[Tuple[int, int, str], str, str]:
+        """Return token details without modification, except comments."""
+        token_range = (token.loc.begin_pos, token.loc.end_pos)
+        return (token_range, token.kind, token.value)
 
-    def _normalize_tokens_list(self, tokens_list: list[Token]) -> list[str]:
-        """
-        Takes a list of tokens and returns a copy with
-        the identifiers tokens renamed as ident_n and
-        without the ignored token kinds.
-        """
+    def _normalize_tokens_list(self, tokens_list: List[Token]) -> List[Tuple[Tuple[int, int, str], str, str]]:
+        """Normalize the token list by renaming identifiers and removing ignored tokens."""
         normalized_tokens = []
-        ignored_token_types = ("newline",)
         identifiers_count = 0
-
         for token in tokens_list:
-            token_type = token.kind
-            if token_type == "ident":
-                normalized_tokens.append(
-                    self._process_identifier_token(token, counter=identifiers_count)
-                )
+            if token.kind == "ident":
+                normalized_tokens.append(self._process_identifier_token(token, identifiers_count))
                 identifiers_count += 1
-            elif token_type not in ignored_token_types:
+            elif token.kind not in self.ignored_token_types:
                 normalized_tokens.append(self._process_token(token))
-
         return normalized_tokens
 
-    def _get_matching_blocks(
-        self, file1_tokens: tuple[str], file2_tokens: tuple[str]
-    ) -> list[Match]:
-        """"""
-        matcher = difflib.SequenceMatcher(None, file1_tokens, file2_tokens)
-        matching_blocks = matcher.get_matching_blocks()
-        return matching_blocks
+    def _get_matching_blocks(self, tokens1: List[str], tokens2: List[str]) -> List[Match]:
+        """Use difflib to find matching blocks of tokens."""
+        matcher = difflib.SequenceMatcher(None, tokens1, tokens2)
+        return matcher.get_matching_blocks()
 
-    def _extract_index_range_from_tokens(self, tokens_list):
-        """"""
-        match_ranges = [token[0][:-1] for token in tokens_list]
-        match_start = match_ranges[0][0]
-        match_end = match_ranges[-1][-1]
-        return match_start, match_end
-
-    def find_match_ranges_from_tokens(self, token_list_1: str, token_list_2: str):
-        """"""
-        match_ranges = []
+    def find_match_ranges_from_tokens(self, token_list_1: List[Token], token_list_2: List[Token]) -> List[Tuple[Tuple[int, int], Tuple[int, int]]]:
+        """Find match ranges between two lists of tokens."""
         normalized_list_1 = self._normalize_tokens_list(token_list_1)
         normalized_list_2 = self._normalize_tokens_list(token_list_2)
-        token_values_1 = [token[1:] for token in normalized_list_1]
-        token_values_2 = [token[1:] for token in normalized_list_2]
+        token_values_1 = [token[2] for token in normalized_list_1]
+        token_values_2 = [token[2] for token in normalized_list_2]
         matching_blocks = self._get_matching_blocks(token_values_1, token_values_2)
-
+        match_ranges = []
         for block in matching_blocks:
-            i, j, n = block
-            if n > 0:
-                matching_tokens_1 = normalized_list_1[i : i + n]
-                matching_tokens_2 = normalized_list_2[j : j + n]
-                start_match_1, end_match_1 = self._extract_index_range_from_tokens(
-                    matching_tokens_1
-                )
-                start_match_2, end_match_2 = self._extract_index_range_from_tokens(
-                    matching_tokens_2
-                )
-                match_ranges.append(
-                    ((start_match_1, end_match_1), (start_match_2, end_match_2))
-                )
-
+            if block.size > 0:
+                start1, start2, size = block
+                match_range_1 = (normalized_list_1[start1][0][0], normalized_list_1[start1 + size - 1][0][1])
+                match_range_2 = (normalized_list_2[start2][0][0], normalized_list_2[start2 + size - 1][0][1])
+                match_ranges.append((match_range_1, match_range_2))
         return match_ranges

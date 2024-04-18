@@ -22,15 +22,13 @@ class FileManager:
             return file.read()
 
     def load_file(self, file_path: str) -> None:
-        """Process and stores the data of a given file inside
-        the processed_files dictionary."""
         file_name = os.path.basename(file_path)
-        file_extension = file_name.split(".", 1)[1]
+        file_extension = file_name.split('.')[-1] if '.' in file_name else None
         file_content = self._read_file_content(file_path)
         file_data = {
             "path": file_path,
             "name": file_name,
-            "extention": file_extension,
+            "extension": file_extension,
             "content": file_content,
         }
         formatted_path = os.path.normpath(file_path)

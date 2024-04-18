@@ -17,12 +17,15 @@ if __name__ == "__main__":
     file2_tokens = tokens.generate_tokens_from_file(file2_data)
     matches = tokens.find_match_ranges_from_tokens(file1_tokens, file2_tokens)
 
-    file1_content = files.get_file_data(file1, "content")
-    file2_content = files.get_file_data(file2, "content")
-    for match in matches:
-        print(match)
-        match_range_1, match_range_2 = match[0], match[1]
-        print(file1_content[match_range_1[0] : match_range_1[1]])
-        print(file2_content[match_range_2[0] : match_range_2[1]])
+    file1_content = file1_data["content"]
+    file2_content = file2_data["content"]
 
-    plot_matches(matches, len(file1_content), len(file2_content), img_name="prueba")
+    for match in matches:
+        print("Match Found:")
+        print(f"File 1 Content [{match[0][0]}:{match[0][1]}]:")
+        print(file1_content[match[0][0]:match[0][1]])
+        print(f"File 2 Content [{match[1][0]}:{match[1][1]}]:")
+        print(file2_content[match[1][0]:match[1][1]])
+        print("\n")
+
+    plot_matches(matches, len(file1_content), len(file2_content), img_name="comparison_output")
