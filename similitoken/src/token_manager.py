@@ -58,3 +58,20 @@ class TokenManager:
                 match_range_2 = (normalized_list_2[start2][0][0], normalized_list_2[start2 + size - 1][0][1])
                 match_ranges.append((match_range_1, match_range_2))
         return match_ranges
+    
+    def find_relevant_matches(self, token_list_1, token_list_2):
+        normalized_list_1 = self._normalize_tokens_list(token_list_1)
+        normalized_list_2 = self._normalize_tokens_list(token_list_2)
+        token_values_1 = [token[2] for token in normalized_list_1]
+        token_values_2 = [token[2] for token in normalized_list_2]
+        matcher = difflib.SequenceMatcher(None, token_values_1, token_values_2)
+        matching_blocks = matcher.get_matching_blocks()
+
+        relevant_matches = []
+        for block in matching_blocks:
+            if block.size > 1:  # Considerar sólo bloques de un tamaño mínimo
+                start1, start2, size = block
+                match_range_1 = (normalized_list_1[start1][0][0], normalized_list_1[start1 + size - 1][0][1])
+                match_range_2 = (normalized_list_2[start2][0][0], normalized_list_2[start2 + size - 1][0][1])
+                relevant_matches.append((match_range_1, match_range_2))
+        return relevant_matches
