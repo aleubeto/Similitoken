@@ -1,6 +1,6 @@
 from file_manager import FileManager
 from token_manager import TokenManager
-from plotter import plot_matches
+from plotter import Plotter
 
 if __name__ == "__main__":
     files = FileManager()
@@ -31,4 +31,6 @@ if __name__ == "__main__":
         print(file2_content[match[1][0]:match[1][1]])
         print("\n" + "-"*50 + "\n")
 
-    plot_matches(matches, len(file1_content), len(file2_content), img_name="comparison_output")
+    # Creación de una instancia de Plotter y llamada a la función plot_matches
+    plotter = Plotter()
+    plotter.plot_matches(matches, len(file1_content), len(file2_content), img_name="comparison_output")
