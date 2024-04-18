@@ -7,5 +7,6 @@ setup(
     packages=find_packages(exclude=["tests*"]),
     install_requires=[
         "pythonparser @ https://github.com/m-labs/pythonparser/archive/master.zip",
+        "matplotlib"
     ],
 )
