@@ -15,6 +15,6 @@ def generate_python_tokens(file_data: Dict[str, str]) -> List[Token]:
     return tokens_list
 
 
-token_functions = {
+parser_functions = {
     "py": generate_python_tokens,
 }

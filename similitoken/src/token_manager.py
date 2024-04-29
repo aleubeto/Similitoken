@@ -1,7 +1,7 @@
 from typing import Dict, List, Tuple
 from difflib import SequenceMatcher, Match
 
-from tokens import token_functions
+from parsers import parser_functions
 from pythonparser.lexer import Token
 
 
@@ -20,8 +20,8 @@ class TokenManager:
             ValueError: If the file extension is not supported.
         """
         language_extension = file_data.get("extension")
-        if language_extension in token_functions:
-            return token_functions[language_extension](file_data)
+        if language_extension in parser_functions:
+            return parser_functions[language_extension](file_data)
         raise ValueError(f"Unsupported file extension: {language_extension}")
 
     def _process_identifier_token(
