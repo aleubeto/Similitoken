@@ -1,10 +1,5 @@
 import os
-from typing import Dict, List, Tuple
-from pythonparser.lexer import Token
-import difflib
-from difflib import Match
-
-from tokens import token_functions
+from typing import Dict
 
 
 class FileManager:
@@ -12,18 +7,26 @@ class FileManager:
     in order to find plagiarism between code files."""
 
     def __init__(self) -> None:
+        """Initializes the FileManager."""
         self.processed_files = {}
-        pass
 
     def _read_file_content(self, file_path: str) -> str:
-        """Returns the content of a given file inside
-        a string."""
+        """Reads the content of a given file and returns it as a string.
+        Args:
+            file_path (str): The path to the file.
+        Returns:
+            str: The content of the file.
+        """
         with open(file_path, "r") as file:
             return file.read()
 
     def load_file(self, file_path: str) -> None:
+        """Processes and stores the data of a given file.
+        Args:
+            file_path (str): The path to the file.
+        """
         file_name = os.path.basename(file_path)
-        file_extension = file_name.split('.')[-1] if '.' in file_name else None
+        file_extension = file_name.rsplit(".", 1)[-1] if "." in file_name else None
         file_content = self._read_file_content(file_path)
         file_data = {
             "path": file_path,
@@ -31,16 +34,20 @@ class FileManager:
             "extension": file_extension,
             "content": file_content,
         }
-        formatted_path = os.path.normpath(file_path)
-        self.processed_files[formatted_path] = file_data
+        self.processed_files[file_path] = file_data
 
     def get_file_data(self, file_path: str, key: str = None) -> Dict[str, str]:
-        """Returns a dictionary with name, path, file extention,
-        content and tokens list from a given file."""
-        formatted_path = os.path.normpath(file_path)
-        file_data = (
-            self.processed_files.get(formatted_path).get(key)
-            if key
-            else self.processed_files.get(formatted_path)
-        )
+        """Retrieves data of a given file.
+        Args:
+            file_path (str): The path to the file.
+            key (str, optional): The specific information to retrieve.
+                If None, returns all file data. Defaults to None.
+        Returns:
+            Dict[str, str]: The requested file data.
+        """
+        file_data = self.processed_files.get(file_path)
+        if not file_data:
+            return {}
+        if key:
+            return {key: file_data.get(key)}
         return file_data

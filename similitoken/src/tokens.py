@@ -1,8 +1,10 @@
+from typing import List, Dict
+
 from pythonparser import lexer, source, diagnostic
-from typing import Dict
+from pythonparser.lexer import Token
 
 
-def generate_python_tokens(file_data: Dict[str, str]) -> list:
+def generate_python_tokens(file_data: Dict[str, str]) -> List[Token]:
     """Return a list of Token objects with the tokens found in a code file."""
     file_path = file_data.get("path")
     file_content = file_data.get("content")
