@@ -99,8 +99,8 @@ class TokenManager:
         """
         normalized_list_1 = self._normalize_tokens_list(token_list_1)
         normalized_list_2 = self._normalize_tokens_list(token_list_2)
-        token_values_1 = [token[2] for token in normalized_list_1]
-        token_values_2 = [token[2] for token in normalized_list_2]
+        token_values_1 = [(token[1], token[2]) for token in normalized_list_1]
+        token_values_2 = [(token[1], token[2]) for token in normalized_list_2]
         matching_blocks = self._get_matching_blocks(token_values_1, token_values_2)
         match_ranges = []
         for block in matching_blocks:
