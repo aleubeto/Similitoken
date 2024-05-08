@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 from difflib import SequenceMatcher, Match
 
 from parsers import parser_functions
-from pythonparser.lexer import Token
+from lexic_unit import LexicUnit as Token
 
 
 class TokenManager:
@@ -34,8 +34,7 @@ class TokenManager:
         Returns:
             Tuple[Tuple[int, int], str, str]: Processed token details.
         """
-        token_range = (token.loc.begin_pos, token.loc.end_pos)
-        return token_range, token.kind, f"ident_{counter}"
+        return token.range, token.kind, f"ident_{counter}"
 
     def _process_token(self, token: Token) -> Tuple[Tuple[int, int, str], str, str]:
         """Process a token without modifying it, except comments.
@@ -44,8 +43,7 @@ class TokenManager:
         Returns:
             Tuple[Tuple[int, int], str, str]: Processed token details.
         """
-        token_range = (token.loc.begin_pos, token.loc.end_pos)
-        return token_range, token.kind, token.value
+        return token.range, token.kind, token.value
 
     def _normalize_tokens_list(
         self, tokens_list: List[Token]

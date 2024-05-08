@@ -1,7 +1,7 @@
 from typing import List, Dict
 
 from pythonparser import lexer, source, diagnostic
-from pythonparser.lexer import Token
+from lexic_unit import LexicUnit as Token
 
 
 def generate_python_tokens(file_data: Dict[str, str]) -> List[Token]:
@@ -11,7 +11,10 @@ def generate_python_tokens(file_data: Dict[str, str]) -> List[Token]:
     buffer = source.Buffer(file_content, file_path)
     engine = diagnostic.Engine()
     tokens = lexer.Lexer(buffer, (3, 6), diagnostic_engine=engine)
-    tokens_list = [token for token in tokens]
+    tokens_list = [
+        Token((token.loc.begin_pos, token.loc.end_pos), token.kind, token.value)
+        for token in tokens
+    ]
     return tokens_list
 
 
